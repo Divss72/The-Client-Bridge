@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import Cookies from "js-cookie";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { format } from "date-fns";
 import { 
   Target, Plus, Search, MoreHorizontal, ArrowRightCircle
@@ -51,9 +51,7 @@ export default function LeadsPage() {
 
   const fetchLeads = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/leads/", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/leads/");
       setLeads(res.data);
     } catch (error) {
       toast.error("Failed to load leads");
@@ -69,9 +67,7 @@ export default function LeadsPage() {
   const handleCreateLead = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8000/api/leads/", formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post("/leads/", formData);
       toast.success("Lead created successfully");
       setIsAddOpen(false);
       setFormData({ company_name: "", contact_name: "", email: "", phone: "", industry: "" });
@@ -83,9 +79,7 @@ export default function LeadsPage() {
 
   const handleConvert = async (leadId: number) => {
     try {
-      await axios.post(`http://localhost:8000/api/leads/${leadId}/convert`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.post(`/leads/${leadId}/convert`, {});
       toast.success("Lead successfully converted to Client");
       fetchLeads();
     } catch (error) {
@@ -95,9 +89,7 @@ export default function LeadsPage() {
 
   const updateStatus = async (leadId: number, status: string) => {
     try {
-      await axios.put(`http://localhost:8000/api/leads/${leadId}`, { status }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/leads/${leadId}`, { status });
       toast.success("Status updated");
       fetchLeads();
     } catch (error) {

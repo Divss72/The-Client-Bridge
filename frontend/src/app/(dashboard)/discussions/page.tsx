@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import Cookies from "js-cookie";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { 
   Presentation, MessageSquare, Send, Users, Loader2 
 } from "lucide-react";
@@ -50,9 +50,7 @@ export default function DiscussionsPage() {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/clients/", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get("/clients/");
         setClients(res.data);
         if (res.data.length > 0) {
           setSelectedClient(res.data[0]);
@@ -70,9 +68,7 @@ export default function DiscussionsPage() {
     const fetchDiscussions = async () => {
       if (!selectedClient) return;
       try {
-        const res = await axios.get(`http://localhost:8000/api/discussions/client/${selectedClient.id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get(`/discussions/client/${selectedClient.id}`);
         setDiscussions(res.data);
         if (res.data.length > 0) {
           setSelectedDisc(res.data[0]);
@@ -89,12 +85,9 @@ export default function DiscussionsPage() {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim() || !selectedDisc) return;
-
     try {
-      const res = await axios.post(`http://localhost:8000/api/discussions/${selectedDisc.id}/messages`, {
+      const res = await api.post(`/discussions/${selectedDisc.id}/messages`, {
         content: message
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       
       // Update local state

@@ -12,7 +12,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
 
 interface Notification {
@@ -30,12 +30,7 @@ export function NotificationPopover() {
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-      
-      const res = await axios.get("http://localhost:8000/api/notifications/", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/notifications/");
       setNotifications(res.data);
       setUnreadCount(res.data.filter((n: Notification) => !n.read).length);
     } catch (error) {
@@ -52,10 +47,7 @@ export function NotificationPopover() {
 
   const markAsRead = async (id: number) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:8000/api/notifications/${id}/read`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/notifications/${id}/read`, {});
       setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
@@ -65,10 +57,7 @@ export function NotificationPopover() {
 
   const markAllAsRead = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:8000/api/notifications/read-all`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/notifications/read-all`, {});
       setNotifications(notifications.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {

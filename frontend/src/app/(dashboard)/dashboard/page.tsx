@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import Cookies from "js-cookie";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { 
   Users, Activity, TrendingUp, AlertCircle, Kanban, 
   Target, Bell, BrainCircuit
@@ -36,13 +36,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = Cookies.get("access_token");
       try {
         const [clientsRes, pipelineRes, leadsRes, tasksRes] = await Promise.all([
-          axios.get("http://localhost:8000/api/clients/", { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get("http://localhost:8000/api/pipeline/", { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get("http://localhost:8000/api/leads/", { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get("http://localhost:8000/api/tasks/", { headers: { Authorization: `Bearer ${token}` } })
+          api.get("/clients/"),
+          api.get("/pipeline/"),
+          api.get("/leads/"),
+          api.get("/tasks/")
         ]);
 
         const clients = clientsRes.data;
@@ -87,9 +86,7 @@ export default function DashboardPage() {
       }
     };
 
-    const token = Cookies.get("access_token");
-    if (token) fetchData();
-    else setLoading(false);
+    fetchData();
   }, []);
 
   if (loading) {

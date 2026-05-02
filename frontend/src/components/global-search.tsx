@@ -13,7 +13,7 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import axios from "axios";
+import { api } from "@/lib/api";
 
 interface SearchResults {
   clients: { id: number; name: string; type: string }[];
@@ -49,10 +49,7 @@ export function GlobalSearch() {
       }
       setIsLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:8000/api/search/global?q=${query}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await api.get(`/search/global?q=${query}`);
         setResults(res.data);
       } catch (err) {
         console.error(err);

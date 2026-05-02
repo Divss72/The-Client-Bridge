@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import Cookies from "js-cookie";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { 
   Kanban, Plus, MoreHorizontal, DollarSign, Calendar
 } from "lucide-react";
@@ -44,9 +44,7 @@ export default function PipelinePage() {
 
   const fetchDeals = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/pipeline/", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/pipeline/");
       setDeals(res.data);
     } catch (error) {
       toast.error("Failed to load deals");
@@ -62,12 +60,10 @@ export default function PipelinePage() {
   const handleCreateDeal = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8000/api/pipeline/", {
+      await api.post("/pipeline/", {
         ...formData,
         amount: parseFloat(formData.amount) || 0,
         expected_close_date: formData.expected_close_date ? new Date(formData.expected_close_date).toISOString() : null
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Deal created");
       setIsAddOpen(false);
@@ -83,9 +79,7 @@ export default function PipelinePage() {
     setDeals(prev => prev.map(d => d.id === dealId ? { ...d, stage: newStage } : d));
     
     try {
-      await axios.put(`http://localhost:8000/api/pipeline/${dealId}`, { stage: newStage }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/pipeline/${dealId}`, { stage: newStage });
       toast.success("Stage updated");
     } catch (error) {
       toast.error("Failed to update stage");

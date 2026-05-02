@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "@/stores/auth-store";
 import Cookies from "js-cookie";
-import axios from "axios";
+import { api } from "@/lib/api";
 import { 
   Bell, CheckCircle2, Circle, Clock, MoreHorizontal, Plus
 } from "lucide-react";
@@ -34,9 +34,7 @@ export default function TasksPage() {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/tasks/", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const res = await api.get("/tasks/");
       setTasks(res.data);
     } catch (error) {
       toast.error("Failed to load tasks");
@@ -52,9 +50,7 @@ export default function TasksPage() {
   const updateStatus = async (taskId: number, status: string) => {
     setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t));
     try {
-      await axios.put(`http://localhost:8000/api/tasks/${taskId}`, { status }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await api.put(`/tasks/${taskId}`, { status });
       toast.success("Task updated");
     } catch (error) {
       toast.error("Update failed");
